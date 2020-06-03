@@ -25,7 +25,26 @@ org: runaticmoon
 provider:
   name: aws
   runtime: nodejs12.x
+  stage: ${env:STAGE}
   region: ap-northeast-2
+  tracing: true
+  iamRoleStatements:
+    - Effect: 'Allow' # xray permissions (required)
+      Action:
+        - 'xray:PutTraceSegments'
+        - 'xray:PutTelemetryRecords'
+      Resource:
+        - '*'
+    # for S3
+    - Effect: 'Allow'
+      Action:
+        - 's3:*'
+      Resource:
+        - 'arn:aws:s3:::instatour-image'
+        - 'arn:aws:s3:::instatour-image/*'
+  deploymentBucket:
+    name: instatour-aws-${env:STAGE}-serverlessdeploymentbucket
+    serverSideEncryption: AES256
 
 # you can overwrite defaults here
 #  stage: dev
@@ -47,9 +66,20 @@ provider:
 #            - "Ref" : "ServerlessDeploymentBucket"
 #            - "/*"
 
+plugins:
+  - serverless-deployment-bucket
+  - serverless-dotenv-plugin
+  - serverless-plugin-typescript
+  - serverless-plugin-tracing
+
 # you can define service wide environment variables here
 #  environment:
 #    variable1: value1
+
+custom:
+  dynamodbStream:
+    prod: arn:aws:dynamodb:ap-northeast-2:476436137924:table/InstaTourRawData/stream/2020-05-12T08:17:03.285
+    dev: arn:aws:dynamodb:ap-northeast-2:476436137924:table/Test/stream/2020-05-12T18:10:01.989
 
 # you can add packaging information here
 #package:
@@ -63,6 +93,17 @@ provider:
 functions:
   hello:
     handler: handler.hello
+  # DynamoDB Trigger
+  PostDBUpdate:
+    handler: src/postDBUpdate.handler
+    timeout: 900
+    events:
+      - stream: ${self:custom.dynamodbStream.${env:STAGE}}
+  imageDownloader:
+    handler: src/imageDownloader.handler
+    timeout: 900
+    events:
+      - stream: ${self:custom.dynamodbStream.${env:STAGE}}
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details
