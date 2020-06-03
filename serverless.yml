@@ -89,10 +89,11 @@ custom:
 #  exclude:
 #    - exclude-me.js
 #    - exclude-me-dir/**
+package:
+  exclude:
+    - run/**
 
 functions:
-  hello:
-    handler: handler.hello
   # DynamoDB Trigger
   PostDBUpdate:
     handler: src/postDBUpdate.handler
@@ -104,6 +105,13 @@ functions:
     timeout: 900
     events:
       - stream: ${self:custom.dynamodbStream.${env:STAGE}}
+  # Cognito Trigger
+  preSignUp:
+    handler: src/preSignUp.handler
+    events:
+      - cognitoUserPool:
+        pool: ${env:STAGE}-user-pool
+        trigger: PreSignUp
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details
