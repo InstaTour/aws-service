@@ -18,7 +18,7 @@ const driver = neo4j.driver(
 export { int };
 
 // Custom Function
-export async function tx(querys: Query[], params: Parameters[]) {
+export async function tx(querys: Query[], params: Parameters[], num?: Number) {
   const session = driver.session();
   const txc = session.beginTransaction();
   try {
@@ -27,7 +27,7 @@ export async function tx(querys: Query[], params: Parameters[]) {
       result.push(await txc.run(querys[i], params[i]));
     }
     await txc.commit();
-    console.log('committed');
+    console.log('committed' + num);
     return result;
   } catch (error) {
     console.error(error);

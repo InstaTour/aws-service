@@ -16,11 +16,13 @@
     "serverless-dotenv-plugin": "^2.4.2",
     "serverless-plugin-tracing": "^2.0.0",
     "serverless-plugin-typescript": "^1.1.9",
+    "ts-node": "^8.10.2",
     "typescript": "^3.9.3"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "offline": "sls offline start --disableCookieValidation --useChildProcesses"
+    "offline": "sls offline start --disableCookieValidation --useChildProcesses",
+    "scan": "ts-node run/scan.ts"
   },
   "repository": {
     "type": "git",
