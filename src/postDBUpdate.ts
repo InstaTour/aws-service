@@ -76,7 +76,7 @@ exports.handler = async (event: any, context: Context, callback: Callback) => {
       querys.push(Query.post_hashtag_relation);
       params.push({
         pid: key,
-        tid: hashtag,
+        tid: hashtag.toLowerCase(),
       });
     }
 
