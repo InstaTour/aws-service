@@ -53,7 +53,7 @@ exports.handler = async (event: any, context: Context, callback: Callback) => {
     let params: Object[] = [];
 
     // 이미지 S3로 연결
-    img.img_url = `${process.env.S3_URL}/${process.env.STAGE}/${key}.jpg`;
+    img.img_url = [`${process.env.S3_URL}/${process.env.STAGE}/${key}.jpg`];
 
     // 새로 추가시
     if (record.eventName == 'INSERT') {
